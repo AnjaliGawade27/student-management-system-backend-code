@@ -23,7 +23,7 @@ public class StudentServiceImpl implements StudentService {
 
     //Add Student Method
     @Override
-    public StudentDTO addStudent(StudentDTO dto) 
+    /*public StudentDTO addStudent(StudentDTO dto) 
     {
         User user = userRepository.findById(dto.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getUserId()));
@@ -31,8 +31,27 @@ public class StudentServiceImpl implements StudentService {
         Student student = studentMapper.toEntity(dto, user);
         Student saved = studentRepository.save(student);
         return studentMapper.toDTO(saved);
-    }
+    }*/
 
+    public StudentDTO addStudent(StudentDTO dto) {
+        User user;
+        if (dto.getUserId() != null) {
+            // Try to fetch the existing user
+            user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getUserId()));
+        } else {
+            // Create a new user if no ID is provided
+            user = new User();
+            user.setUsername(dto.getName()); // or generate based on your logic
+            user.setPassword("defaultPassword"); // hash it in real app
+            user.setRole("STUDENT");
+            user = userRepository.save(user);
+        }
+
+        Student student = studentMapper.toEntity(dto, user);
+        Student saved = studentRepository.save(student);
+        return studentMapper.toDTO(saved);
+    }
     
     //Get All Students Method
     @Override
